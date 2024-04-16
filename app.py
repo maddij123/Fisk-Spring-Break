@@ -240,21 +240,19 @@ def calculate_expenses():
 
     except Exception as e:
         return str(e)
- 
-
-@app.route('/drive-expense')
-def drive_expense():
+@app.route('/drive-expenses', methods=['POST'])
+def drive_expenses():
     try:
-        trip_id = session['trip_id']
+        trip_id = request.form['trip_id']
 
         conn = mysql.connect()
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor()
         cursor.execute("SELECT DISTANCE, HOTEL_PRICE FROM DESTINATIONS WHERE DESTINATION_ID = "
                        "(SELECT DESTINATION_ID FROM TRIP WHERE TRIP_ID = %s)", (trip_id,))
         trip_data = cursor.fetchone()
 
-        num_miles = trip_data['DISTANCE']
-        hotel_price = trip_data['HOTEL_PRICE']
+        num_miles = trip_data[0]  # Accessing distance at index 0
+        hotel_price = trip_data[1]  # Accessing hotel price at index 1
 
         cursor.close()
         conn.close()
@@ -263,5 +261,7 @@ def drive_expense():
     except Exception as e:
         return str(e)
 
+
 if __name__ == "__main__":
     app.run(debug=True)
+
