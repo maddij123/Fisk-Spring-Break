@@ -4,25 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trip Plan</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Link your CSS file -->
+    <link rel="stylesheet" href="styles.css"> 
 </head>
 <body>
     <div class="container">
-        <h1>Trip Plan</h1>
-        <h2>Trip Information</h2>
-        <div class="trip-info">
-            {% for trip in trips %}
-            <div class="trip">
-                <h3>Trip ID: {{ trip.TRIP_ID }}</h3>
-                <p><strong>Destination ID:</strong> {{ trip.DESTINATION_ID }}</p>
-                <p><strong>Start Date:</strong> {{ trip.START_DATE }}</p>
-                <p><strong>End Date:</strong> {{ trip.END_DATE }}</p>
-                <p><strong>Number of People:</strong> {{ trip.NUM_PEOPLE }}</p>
-                <p><strong>Price Per Person:</strong> ${{ trip.PRICE_PER_PERSON }}</p>
-                <p><strong>User ID:</strong> {{ trip.USER_ID }}</p>
-            </div>
-            {% endfor %}
-        </div>
+        <h2>Trip Added Successfully</h2>
+        <p>You are now taking a trip to {{ trip_name }}</p>
+        <p>Let's take a look at the expenses.</p>
+        <a href="/expenses" class="button">Go to Expenses</a>
     </div>
 </body>
 </html>
