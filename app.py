@@ -74,7 +74,7 @@ app.secret_key = 'secret'
 # MySQL configurations
 app.config['MYSQL_DATABASE_USER'] = 'root'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'skippero56'
-app.config['MYSQL_DATABASE_DB'] = 'test'
+app.config['MYSQL_DATABASE_DB'] = 'test2'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 
@@ -173,42 +173,70 @@ def add_trip():
             _destination_id = request.form['destination_id']
             _start_date = request.form['start_date']
             _end_date = request.form['end_date']
-            _num_people = request.form['num_people']
-            _price_per_person = request.form['price_per_person']
             _user_id = session['user_id']  # Get USER_ID from session
+
+            # Fetch selected trip name
+            conn = mysql.connect()
+            cursor = conn.cursor()
+            cursor.execute("SELECT NAME FROM DESTINATIONS WHERE DESTINATION_ID = %s", (_destination_id,))
+            selected_trip_name = cursor.fetchone()[0]
+            conn.close()
 
             conn = mysql.connect()
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO TRIP (DESTINATION_ID, START_DATE, END_DATE, NUM_PEOPLE, PRICE_PER_PERSON, USER_ID) VALUES (%s, %s, %s, %s, %s, %s)",
-                           (_destination_id, _start_date, _end_date, _num_people, _price_per_person, _user_id))
+            cursor.execute("INSERT INTO TRIP (DESTINATION_ID, USER_ID, START_DATE, END_DATE) VALUES (%s, %s, %s, %s)",
+                           (_destination_id, _user_id, _start_date, _end_date))
             conn.commit()
 
-            return render_template('tripplan.html')
+            return render_template('tripplan.html', trip_name=selected_trip_name)  # Pass trip name to the success page
         except Exception as e:
             return jsonify({'error': str(e)})
         finally:
             cursor.close()
             conn.close()
     else:
-        return render_template('index.html')
-
-@app.route('/trip_info')
-def trip_info():
-    if 'user_id' in session:
-        try:
-            # Fetch trip information from the database
-            conn = mysql.connect()
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM TRIP WHERE USER_ID = %s", (session['user_id'],))
-            trips = cursor.fetchall()  # Fetch all trips for the logged-in user
-            cursor.close()
-            conn.close()
-
-            return render_template('tripplan.html', trips=trips)
-        except Exception as e:
-            return jsonify({'error': str(e)})
-    else:
         return redirect(url_for('login'))
+
+
+@app.route('/expenses')
+def expenses():
+    # You can add any necessary data to pass to the expenses.html template here
+    return render_template('expenses.html')
+
+
+@app.route('/flight-page')
+def flight_page():
+    return render_template('flight.html')
+
+@app.route('/drive')
+def drive():
+    return render_template('drive.html')
+
+@app.route('/calculate_expenses', methods=['POST'])
+def calculate_expenses():
+    try:
+        _trip_id = request.form['trip_id']
+        _num_people = int(request.form['num_people'])
+
+        conn = mysql.connect(host='root',
+                                       database='',
+                                       user='your_username',
+                                       password='your_password')
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("SELECT * FROM DESTINATIONS WHERE DESTINATION_ID = "
+                       "(SELECT DESTINATION_ID FROM TRIP WHERE TRIP_ID = %s)", (_trip_id,))
+        destination = cursor.fetchone()
+
+        total_expenses = (_num_people * (destination['FLIGHT_PRICE'] + destination['HOTEL_PRICE']))
+
+        cursor.close()
+        conn.close()
+
+        return render_template('flight-expenses.html', destination=destination, num_people=_num_people,
+                               total_expenses=total_expenses)
+    except Exception as e:
+        return str(e)
 
 
 
