@@ -32,7 +32,7 @@ def signUp():
         if _first and _last and _email and _password and _phone:
             users_collection = db['users']
             existing_user = users_collection.find_one({'email': _email})
-            
+           
             if existing_user:
                 return json.dumps({'error': 'User already exists with this email'})
             else:
