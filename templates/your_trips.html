@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Trips</title>
+</head>
+<body>
+    <h1>Your Trips</h1>
+    <ul>
+        {% for trip in trips %}
+        <li>Trip ID: {{ trip.TRIP_ID }}, Destination ID: {{ trip.DESTINATION_ID }}, Start Date: {{ trip.START_DATE }}, End Date: {{ trip.END_DATE }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
