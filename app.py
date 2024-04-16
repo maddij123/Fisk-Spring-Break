@@ -3,70 +3,6 @@ from flaskext.mysql import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import jsonify
 
-
-# mysql = MySQL()
-# app = Flask(__name__)
-
-# # MySQL configurations
-# app.config['MYSQL_DATABASE_USER'] = 'root'
-# app.config['MYSQL_DATABASE_PASSWORD'] = 'skippero56'
-# app.config['MYSQL_DATABASE_DB'] = 'travel_planner'
-# app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-# mysql.init_app(app)
-
-
-# @app.route('/')
-# def main():
-#     return render_template('index.html')
-
-
-# @app.route('/signup')
-# def showSignUp():
-#     return render_template('signup.html')
-
-
-
-# @app.route('/api/signup', methods=['POST'])
-# def signUp():
-#     try:
-#         _first = request.form['inputfName']
-#         _last = request.form['inputlName']
-#         _email = request.form['inputEmail']
-#         _number = request.form['inputNumber']
-#         _password = request.form['inputPassword']
-
-
-#         # validate the received values
-#         if _first and _last and _email and _password and _number:
-
-#             # All Good, let's call MySQL
-
-#             conn = mysql.connect()
-#             cursor = conn.cursor()
-#             _hashed_password = generate_password_hash(_password)
-#             cursor.callproc('sp_createUser', (_first, _last, _email, _password, _number))
-#             data = cursor.fetchall()
-
-#             if len(data) == 0:
-#                 conn.commit()
-#                 return json.dumps({'message': 'User created successfully !'})
-#             else:
-#                 return json.dumps({'error': str(data[0])})
-#         else:
-#             return json.dumps({'error': 'Enter all required fields'})
-
-#     except Exception as e:
-#         print("Error:", e)
-#         return json.dumps({'error': 'An error occurred while processing your request'})
-
-#     finally:
-#         cursor.close()
-#         conn.close()
-
-
-# if __name__ == "__main__":
-#     app.run()
-
 mysql = MySQL()
 app = Flask(__name__)
 
@@ -260,8 +196,39 @@ def drive_expenses():
         return render_template('drive-expenses.html', num_miles=num_miles, hotel_price=hotel_price)
     except Exception as e:
         return str(e)
+    
+
+@app.route('/your_trips')
+def your_trips():
+    if 'user_id' in session:
+        user_id = session['user_id']  # Get the user ID from session
+        # Fetch user's trips from the database
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM TRIP WHERE USER_ID = %s", (user_id,))
+        trips_data = cursor.fetchall()
+        
+        # Convert the fetched data into dictionaries
+        trips = []
+        for trip in trips_data:
+            trip_dict = {
+                'TRIP_ID': trip[0],
+                'DESTINATION_ID': trip[1],
+                'USER_ID': trip[2],
+                'START_DATE': trip[3],
+                'END_DATE': trip[4]
+            }
+            trips.append(trip_dict)
+        
+        cursor.close()
+        conn.close()
+        return render_template('your_trips.html', trips=trips)
+    else:
+        return redirect(url_for('login'))
+
 
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 
