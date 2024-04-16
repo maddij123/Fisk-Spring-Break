@@ -242,7 +242,26 @@ def calculate_expenses():
         return str(e)
  
 
+@app.route('/drive-expense')
+def drive_expense():
+    try:
+        trip_id = session['trip_id']
 
+        conn = mysql.connect()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT DISTANCE, HOTEL_PRICE FROM DESTINATIONS WHERE DESTINATION_ID = "
+                       "(SELECT DESTINATION_ID FROM TRIP WHERE TRIP_ID = %s)", (trip_id,))
+        trip_data = cursor.fetchone()
+
+        num_miles = trip_data['DISTANCE']
+        hotel_price = trip_data['HOTEL_PRICE']
+
+        cursor.close()
+        conn.close()
+
+        return render_template('drive-expenses.html', num_miles=num_miles, hotel_price=hotel_price)
+    except Exception as e:
+        return str(e)
 
 if __name__ == "__main__":
     app.run(debug=True)
