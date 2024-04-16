@@ -3,70 +3,6 @@ from flaskext.mysql import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import jsonify
 
-
-# mysql = MySQL()
-# app = Flask(__name__)
-
-# # MySQL configurations
-# app.config['MYSQL_DATABASE_USER'] = 'root'
-# app.config['MYSQL_DATABASE_PASSWORD'] = 'skippero56'
-# app.config['MYSQL_DATABASE_DB'] = 'travel_planner'
-# app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-# mysql.init_app(app)
-
-
-# @app.route('/')
-# def main():
-#     return render_template('index.html')
-
-
-# @app.route('/signup')
-# def showSignUp():
-#     return render_template('signup.html')
-
-
-
-# @app.route('/api/signup', methods=['POST'])
-# def signUp():
-#     try:
-#         _first = request.form['inputfName']
-#         _last = request.form['inputlName']
-#         _email = request.form['inputEmail']
-#         _number = request.form['inputNumber']
-#         _password = request.form['inputPassword']
-
-
-#         # validate the received values
-#         if _first and _last and _email and _password and _number:
-
-#             # All Good, let's call MySQL
-
-#             conn = mysql.connect()
-#             cursor = conn.cursor()
-#             _hashed_password = generate_password_hash(_password)
-#             cursor.callproc('sp_createUser', (_first, _last, _email, _password, _number))
-#             data = cursor.fetchall()
-
-#             if len(data) == 0:
-#                 conn.commit()
-#                 return json.dumps({'message': 'User created successfully !'})
-#             else:
-#                 return json.dumps({'error': str(data[0])})
-#         else:
-#             return json.dumps({'error': 'Enter all required fields'})
-
-#     except Exception as e:
-#         print("Error:", e)
-#         return json.dumps({'error': 'An error occurred while processing your request'})
-
-#     finally:
-#         cursor.close()
-#         conn.close()
-
-
-# if __name__ == "__main__":
-#     app.run()
-
 mysql = MySQL()
 app = Flask(__name__)
 
@@ -218,23 +154,28 @@ def calculate_expenses():
         _trip_id = request.form['trip_id']
         _num_people = int(request.form['num_people'])
 
-        conn = mysql.connect(host='root',
-                                       database='',
-                                       user='your_username',
-                                       password='your_password')
-        cursor = conn.cursor(dictionary=True)
+        conn = mysql.connect()
+        cursor = conn.cursor()
 
-        cursor.execute("SELECT * FROM DESTINATIONS WHERE DESTINATION_ID = "
-                       "(SELECT DESTINATION_ID FROM TRIP WHERE TRIP_ID = %s)", (_trip_id,))
+        cursor.execute("SELECT DESTINATIONS.FLIGHT_PRICE, DESTINATIONS.HOTEL_PRICE FROM DESTINATIONS "
+                       "JOIN TRIP ON DESTINATIONS.DESTINATION_ID = TRIP.DESTINATION_ID "
+                       "WHERE TRIP.TRIP_ID = %s", (_trip_id,))
+        
         destination = cursor.fetchone()
 
-        total_expenses = (_num_people * (destination['FLIGHT_PRICE'] + destination['HOTEL_PRICE']))
+        if destination:
+            flight_price = destination[0]
+            hotel_price = destination[1]
 
-        cursor.close()
-        conn.close()
+            total_expenses = _num_people * (flight_price + hotel_price)
+            cursor.close()
+            conn.close()
 
-        return render_template('flight-expenses.html', destination=destination, num_people=_num_people,
-                               total_expenses=total_expenses)
+            return render_template('flight-expenses.html', destination=destination, num_people=_num_people,
+                                   total_expenses=total_expenses)
+        else:
+            return 'Destination not found for the given trip ID.'
+
     except Exception as e:
         return str(e)
 
