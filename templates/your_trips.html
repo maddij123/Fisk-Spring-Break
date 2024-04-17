@@ -9,9 +9,14 @@
     <h1>Your Trips</h1>
     <ul>
         {% for trip in trips %}
-        <li>Trip ID: {{ trip.TRIP_ID }}, Destination ID: {{ trip.DESTINATION_ID }}, Start Date: {{ trip.START_DATE }}, End Date: {{ trip.END_DATE }}</li>
+        <li>
+            <strong>Trip ID:</strong> {{ trip.trip_id }}, 
+            <strong>Destination:</strong> {{ trip.destination_name }}, 
+            <strong>Start Date:</strong> {{ trip.start_date }}, 
+            <strong>End Date:</strong> {{ trip.end_date }}
+        </li>
         {% endfor %}
     </ul>
-    <a href="expenses.html" class="button">Go to Expenses</a>
+    <a href="/expenses" class="button">Go to Expenses</a>
 </body>
 </html>
