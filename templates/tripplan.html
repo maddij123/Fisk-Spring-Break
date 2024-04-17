@@ -10,11 +10,31 @@
     <div class="container">
         <h2>Trip Added Successfully</h2>
         <p>You are now taking a trip to {{ trip_name }}</p>
+        <img src="{{ image_url }}" alt="Destination Image">
         <p>Let's take a look at the expenses.</p>
-        <a href="expenses.html" class="button">Go to Expenses</a>
-    </div>
+        <a href="/expenses" class="button">Go to Expenses</a>
+
+        <!-- Display activities table -->
+        <h2>Activities You Could Do:</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for activity in activities %}
+                <tr>
+                    <td>{{ activity[0] }}</td>
+                    <td>{{ activity[1] }}</td>
+                    <td>{{ activity[2] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </body>
 </html>
-
 
