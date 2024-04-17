@@ -23,9 +23,9 @@ CREATE TABLE ADMIN (
     PASSWORD_HASH CHAR(60) NOT NULL, 
     ADMIN_ROLE VARCHAR(50)
 );
-INSERT INTO ADMIN (NAME, DESCRIPTION, LOCATION, FLIGHT_PRICE, DISTANCE, HOTEL_NAME, HOTEL_PRICE)
+INSERT INTO ADMIN (FIRST_NAME, LAST_NAME, EMAIL, PASSWORD_HASH, ADMIN_ROLE)
 VALUES
-('Laila' 'Eliotti', 'lailaeliotti1@gmail.com', 'test1234', 'Owner'),
+('Laila' ,'Eliotti', 'lailaeliotti1@gmail.com', 'test1234', 'Owner'),
 ('Madison' 'Jones', 'maddij123@gmail.com', 'test1234', 'Owner');
 
 -- Create the DESTINATIONS table
