@@ -83,9 +83,9 @@ def login():
             return render_template('login.html', message='Invalid email or password.')
 
     return render_template('login.html')
-# admin function
+
 @app.route('/admin', methods=['GET', 'POST'])
-def admin_login():
+def admin_login():  # Rename the function
     if request.method == 'POST':
         email = request.form['inputEmail']
         password = request.form['inputPassword']
@@ -98,28 +98,31 @@ def admin_login():
         conn.close()
 
         if admin and admin[4] == password:
-            session['admin_id'] = admin[0]  # Store user ID in session
-            return redirect(url_for('admin_dashboard'))
+            session['admin_id'] = admin[0]  # Store admin ID in session
+            return redirect(url_for('admin_dashboard'))  # Redirect to admin panel
         else:
             return render_template('adminlogin.html', message='Invalid email or password.')
 
     return render_template('adminlogin.html')
 
+
+
 @app.route('/admin_dashboard')
 def admin_dashboard():
-    if 'admin_id' in session:
+    if 'admin_id' in session:  
         conn = mysql.connect()
         cursor = conn.cursor()
         cursor.execute("""
             SELECT u.FIRST_NAME, u.LAST_NAME, COUNT(t.TRIP_ID) AS NUM_TRIPS
             FROM USERS u
-            LEFT JOIN TRIP ON u.USER_ID = t.USER_ID
+            LEFT JOIN TRIP t ON u.USER_ID = t.USER_ID
             GROUP BY u.FIRST_NAME, u.LAST_NAME;
         """)
         user_trip_data = cursor.fetchall()
+        print(user_trip_data)  # Check if data is retrieved
         cursor.close()
         conn.close()
-        return render_template('admin_dashboard.html', data=user_trip_data)
+        return render_template('admin.html', user_trip_data=user_trip_data)
     else:
         return redirect(url_for('adminlogin'))
 
@@ -276,6 +279,3 @@ def your_trips():
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
-
