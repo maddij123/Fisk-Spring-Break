@@ -58,6 +58,7 @@ def signUp():
     finally:
         cursor.close()
         conn.close()
+
 @app.route('/')
 def index():
     return redirect(url_for('login'))
@@ -101,7 +102,6 @@ def dashboard():
     else:
         return redirect(url_for('login'))
 
-
 @app.route('/add_trip', methods=['POST'])
 def add_trip():
     if 'user_id' in session:
@@ -111,11 +111,18 @@ def add_trip():
             _end_date = request.form['end_date']
             _user_id = session['user_id']  # Get USER_ID from session
 
-            # Fetch selected trip name
+            # Fetch selected trip name and image URL using a JOIN statement
             conn = mysql.connect()
             cursor = conn.cursor()
-            cursor.execute("SELECT NAME FROM DESTINATIONS WHERE DESTINATION_ID = %s", (_destination_id,))
-            selected_trip_name = cursor.fetchone()[0]
+            cursor.execute("""
+                SELECT d.NAME, i.IMAGE_URL 
+                FROM DESTINATIONS d 
+                JOIN IMAGES i ON d.DESTINATION_ID = i.DESTINATION_ID
+                WHERE d.DESTINATION_ID = %s
+            """, (_destination_id,))
+            selected_trip_data = cursor.fetchone()
+            selected_trip_name = selected_trip_data[0]
+            image_url = selected_trip_data[1]
             conn.close()
 
             conn = mysql.connect()
@@ -124,7 +131,7 @@ def add_trip():
                            (_destination_id, _user_id, _start_date, _end_date))
             conn.commit()
 
-            return render_template('tripplan.html', trip_name=selected_trip_name)  # Pass trip name to the success page
+            return render_template('tripplan.html', trip_name=selected_trip_name, image_url=image_url)
         except Exception as e:
             return jsonify({'error': str(e)})
         finally:
@@ -132,7 +139,6 @@ def add_trip():
             conn.close()
     else:
         return redirect(url_for('login'))
-
 
 @app.route('/expenses')
 def expenses():
@@ -201,25 +207,22 @@ def drive_expenses():
 @app.route('/your_trips')
 def your_trips():
     if 'user_id' in session:
-        user_id = session['user_id']  # Get the user ID from session
-        # Fetch user's trips from the database
+        user_id = session['user_id']
         conn = mysql.connect()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM TRIP WHERE USER_ID = %s", (user_id,))
+        cursor.execute("SELECT t.TRIP_ID, t.DESTINATION_ID, t.USER_ID, t.START_DATE, t.END_DATE, d.NAME \
+                        FROM TRIP t \
+                        JOIN DESTINATIONS d ON t.DESTINATION_ID = d.DESTINATION_ID \
+                        WHERE t.USER_ID = %s", (user_id,))
         trips_data = cursor.fetchall()
-        
-        # Convert the fetched data into dictionaries
-        trips = []
-        for trip in trips_data:
-            trip_dict = {
-                'TRIP_ID': trip[0],
-                'DESTINATION_ID': trip[1],
-                'USER_ID': trip[2],
-                'START_DATE': trip[3],
-                'END_DATE': trip[4]
-            }
-            trips.append(trip_dict)
-        
+        trips = [{
+            'trip_id': trip[0],
+            'destination_id': trip[1],
+            'user_id': trip[2],
+            'start_date': trip[3].strftime('%Y-%m-%d'),  # Convert date object to string
+            'end_date': trip[4].strftime('%Y-%m-%d'),    # Convert date object to string
+            'destination_name': trip[5]
+        } for trip in trips_data]
         cursor.close()
         conn.close()
         return render_template('your_trips.html', trips=trips)
@@ -228,7 +231,9 @@ def your_trips():
 
 
 
+
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
