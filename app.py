@@ -146,6 +146,7 @@ def dashboard():
     else:
         return redirect(url_for('login'))
 
+
 @app.route('/add_trip', methods=['POST'])
 def add_trip():
     if 'user_id' in session:
@@ -165,13 +166,16 @@ def add_trip():
             cursor.execute("INSERT INTO TRIP (DESTINATION_ID, USER_ID, START_DATE, END_DATE) VALUES (%s, %s, %s, %s)", (_destination_id, _user_id, _start_date, _end_date))
             conn.commit()
 
+            cursor.execute("SELECT LAST_INSERT_ID()")  # Get the last inserted trip ID
+            trip_id = cursor.fetchone()[0]  # Fetch the trip ID from the result
+
             cursor.execute("SELECT a.NAME, a.DESCRIPTION, a.PRICE FROM ACTIVITIES a JOIN DESTINATIONS d ON a.DESTINATION_ID = d.DESTINATION_ID WHERE d.DESTINATION_ID = %s", (_destination_id,))
             activities = cursor.fetchall()
 
             cursor.close()
             conn.close()
 
-            return render_template('tripplan.html', trip_name=selected_trip_name, image_url=image_url, activities=activities)
+            return render_template('tripplan.html', trip_name=selected_trip_name, image_url=image_url, activities=activities, trip_id=trip_id)
         except Exception as e:
             return jsonify({'error': str(e)})
     else:
