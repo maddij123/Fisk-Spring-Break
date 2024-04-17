@@ -153,36 +153,33 @@ def add_trip():
             _destination_id = request.form['destination_id']
             _start_date = request.form['start_date']
             _end_date = request.form['end_date']
-            _user_id = session['user_id']  # Get USER_ID from session
+            _user_id = session['user_id']
 
-            # Fetch selected trip name and image URL using a JOIN statement
             conn = mysql.connect()
             cursor = conn.cursor()
-            cursor.execute("""
-                SELECT d.NAME, i.IMAGE_URL 
-                FROM DESTINATIONS d 
-                JOIN IMAGES i ON d.DESTINATION_ID = i.DESTINATION_ID
-                WHERE d.DESTINATION_ID = %s
-            """, (_destination_id,))
+            cursor.execute("SELECT d.NAME, i.IMAGE_URL FROM DESTINATIONS d JOIN IMAGES i ON d.DESTINATION_ID = i.DESTINATION_ID WHERE d.DESTINATION_ID = %s", (_destination_id,))
             selected_trip_data = cursor.fetchone()
             selected_trip_name = selected_trip_data[0]
             image_url = selected_trip_data[1]
-            conn.close()
 
-            conn = mysql.connect()
-            cursor = conn.cursor()
-            cursor.execute("INSERT INTO TRIP (DESTINATION_ID, USER_ID, START_DATE, END_DATE) VALUES (%s, %s, %s, %s)",
-                           (_destination_id, _user_id, _start_date, _end_date))
+            cursor.execute("INSERT INTO TRIP (DESTINATION_ID, USER_ID, START_DATE, END_DATE) VALUES (%s, %s, %s, %s)", (_destination_id, _user_id, _start_date, _end_date))
             conn.commit()
 
-            return render_template('tripplan.html', trip_name=selected_trip_name, image_url=image_url)
-        except Exception as e:
-            return jsonify({'error': str(e)})
-        finally:
+            cursor.execute("SELECT a.NAME, a.DESCRIPTION, a.PRICE FROM ACTIVITIES a JOIN DESTINATIONS d ON a.DESTINATION_ID = d.DESTINATION_ID WHERE d.DESTINATION_ID = %s", (_destination_id,))
+            activities = cursor.fetchall()
+
             cursor.close()
             conn.close()
+
+            return render_template('tripplan.html', trip_name=selected_trip_name, image_url=image_url, activities=activities)
+        except Exception as e:
+            return jsonify({'error': str(e)})
     else:
         return redirect(url_for('login'))
+
+
+
+
 
 @app.route('/expenses')
 def expenses():
