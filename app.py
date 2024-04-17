@@ -113,13 +113,12 @@ def admin_dashboard():
         conn = mysql.connect()
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT u.FIRST_NAME, u.LAST_NAME, COUNT(t.TRIP_ID) AS NUM_TRIPS
+            SELECT u.FIRST_NAME, u.LAST_NAME, u.USER_ID, COUNT(t.TRIP_ID) AS NUM_TRIPS
             FROM USERS u
             LEFT JOIN TRIP t ON u.USER_ID = t.USER_ID
-            GROUP BY u.FIRST_NAME, u.LAST_NAME;
+            GROUP BY u.FIRST_NAME, u.LAST_NAME, u.USER_ID;
         """)
         user_trip_data = cursor.fetchall()
-        print(user_trip_data)  # Check if data is retrieved
         cursor.close()
         conn.close()
         return render_template('admin.html', user_trip_data=user_trip_data)
@@ -280,15 +279,21 @@ def delete_user():
         user_id = session['user_id']
         conn = mysql.connect()
         cursor = conn.cursor()
+
+        # Delete associated trip records
+        cursor.execute("DELETE FROM TRIP WHERE USER_ID = %s", (user_id,))
+        conn.commit()
+
+        # Now delete the user
         cursor.execute("DELETE FROM USERS WHERE USER_ID = %s", (user_id,))
         conn.commit()
+
         cursor.close()
         conn.close()
         session.pop('user_id', None)  # Remove user_id from the session
-        return redirect(url_for('index'))  # Redirect the user to the login page
+        return redirect(url_for('admin_dashboard'))  # Redirect the user to the login page
     else:
-        return redirect(url_for('index'))  # If the user is not logged in, redirect them to the login page
-
+        return redirect(url_for('adminlogin'))  # If the user is not logged in, redirect them to the login page
 
 if __name__ == "__main__":
     app.run(debug=True)
