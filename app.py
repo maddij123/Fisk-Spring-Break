@@ -15,7 +15,7 @@ app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 
 
-@app.route('/main')
+@app.route('/')
 def main():
     return render_template('index.html')
 
@@ -294,28 +294,36 @@ def delete_user():
         return redirect(url_for('admin_dashboard'))  # Redirect the user to the login page
     else:
         return redirect(url_for('adminlogin'))  # If the user is not logged in, redirect them to the login page
-    
-@app.route('/update-user', methods=['POST'])
-def update_user():
-    if 'user_id' in session:
-        user_id = session['user_id']
-        new_username = request.form.get('username')
-        new_email = request.form.get('email')
-        new_password = request.form.get('password')
+
+@app.route('/update_password', methods=['GET', 'POST'])
+def update_password():
+    if request.method == 'POST':
+        email = request.form['email']
+        new_password = request.form['password']
 
         conn = mysql.connect()
         cursor = conn.cursor()
 
-        hashed_password = generate_password_hash(new_password, method='sha256')
+        # Check if the user exists
+        cursor.execute("SELECT * FROM USERS WHERE EMAIL = %s", (email,))
+        user = cursor.fetchone()
 
-        cursor.execute("UPDATE USERS SET USERNAME = %s, EMAIL = %s, PASSWORD = %s WHERE USER_ID = %s", (new_username, new_email, hashed_password, user_id))
-        conn.commit()
-        cursor.close()
-        conn.close()
+        if user:
+            user_id = user[0]  # Get the user ID
+            # Update the user's password
+            cursor.execute("UPDATE USERS SET PASSWORD_HASH = %s WHERE USER_ID = %s", (new_password, user_id))
+            conn.commit()
+            cursor.close()
+            conn.close()
+            return redirect(url_for('login'))  # Redirect the user to the login page
+        else:
+            return render_template('password.html', message='User not found.')
 
-        return redirect(url_for('profile'))  # Redirect the user to their profile page
-    else:
-        return redirect(url_for('login'))  # If the user is not logged in, redirect them to the login page
+    return render_template('password.html')
+
+@app.route('/password')
+def password():
+    return render_template('password.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
