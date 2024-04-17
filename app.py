@@ -325,5 +325,81 @@ def update_password():
 def password():
     return render_template('password.html')
 
+# @app.route('/activities')
+# def activities():
+#     return render_template('activities.html')
+
+@app.route('/activities')
+def activities():
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute("SELECT NAME FROM DESTINATIONS")
+    destination_names = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('activities.html', destination_names=destination_names)
+
+@app.route('/add_activity', methods=['POST'])
+def add_activity():
+    try:
+        _activity_name = request.form['name']
+        _activity_description = request.form['description']
+        _price = float(request.form['price'])
+        _destination_name = request.form['destination_name']
+
+        if _destination_name and _activity_name and _activity_description and _price:
+
+            # Get the destination ID based on the provided destination name
+            conn = mysql.connect()
+            cursor = conn.cursor()
+            cursor.execute("SELECT DESTINATION_ID FROM DESTINATIONS WHERE NAME = %s", (_destination_name,))
+            destination_id = cursor.fetchone()
+
+            if destination_id:
+                destination_id = destination_id[0]
+                # Insert the activity into the ACTIVITIES table
+                cursor.execute("INSERT INTO ACTIVITIES (DESTINATION_ID, NAME, DESCRIPTION, PRICE) VALUES (%s, %s, %s, %s)",
+                               (destination_id, _activity_name, _activity_description, _price))
+                conn.commit()
+
+                # Redirect the user to the success page with destination name as parameter
+                return redirect(url_for('activity_success', destination_name=_destination_name))
+            else:
+                return json.dumps({'error': 'Destination not found.'})
+        else:
+            return json.dumps({'error': 'Enter all the required fields.'})
+
+    except Exception as e:
+        return jsonify({'error': str(e)})
+
+@app.route('/activity_success/<destination_name>')
+def activity_success(destination_name):
+    try:
+        # Join the DESTINATIONS table with the PACKING_LIST table to get the success message
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT CONCAT('When going to ', d.NAME, ', make sure you bring ', p.NECESSITY, '!') AS success_message
+            FROM DESTINATIONS d
+            JOIN PACKING_LIST p ON d.DESTINATION_ID = p.DESTINATION_ID
+            WHERE d.NAME = %s
+        """, (destination_name,))
+        success_message_row = cursor.fetchone()
+
+        if success_message_row:
+            success_message = success_message_row[0]
+            cursor.close()
+            conn.close()
+            return render_template('activity_success.html', success_message=success_message)
+        else:
+            cursor.close()
+            conn.close()
+            return "No success message found for this destination."
+
+    except Exception as e:
+        return jsonify({'error': str(e)})
+
+
+
 if __name__ == "__main__":
     app.run(debug=True)
