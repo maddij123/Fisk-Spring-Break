@@ -8,9 +8,11 @@
 </head>
 <body>
     <h1>Admin</h1>
+    <p>Deleting a user will also delete their associated trip records.</p>
     <table>
         <thead>
             <tr>
+                <th>User ID</th>
                 <th>User Name</th>
                 <th>Number of Trips</th>
                 <th>Action</th>
@@ -19,11 +21,12 @@
         <tbody>
             {% for user_trip in user_trip_data %}
             <tr>
-                <td>{{ user_trip[0] }} {{ user_trip[1]}}</td>
-                <td>{{ user_trip[2] }}</td>
+                <td>{{ user_trip[0] }}</td>
+                <td>{{ user_trip[1] }} {{ user_trip[2]}}</td>
+                <td>{{ user_trip[3] }}</td>
                 <td>
                     <form action="/delete-user" method="post">
-                        <input type="text" name="user_id" placeholder="Enter User ID">
+                        <input type="hidden" name="user_id" value="{{ user_trip[0] }}">
                         <input type="submit" value="Delete">
                     </form>
                 </td>
