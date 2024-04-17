@@ -30,11 +30,11 @@ CREATE TABLE DESTINATIONS (
 -- Insert destination data into the DESTINATIONS table
 INSERT INTO DESTINATIONS (NAME, DESCRIPTION, LOCATION, FLIGHT_PRICE, DISTANCE, HOTEL_NAME, HOTEL_PRICE)
 VALUES
-('Miami', 'A vibrant city known for its beautiful beaches, lively nightlife, and diverse culture.', 'Florida', 200.00, 0.00, 'Beachfront Resort', 150.00),
-('Las Vegas', 'The entertainment capital of the world, famous for its casinos, shows, and nightlife.', 'Nevada', 300.00, 0.00, 'Luxury Hotel & Casino', 200.00),
-('Myrtle Beach', 'A popular beach destination known for its pristine coastline and family-friendly attractions.', 'South Carolina', 250.00, 0.00, 'Oceanfront Resort', 120.00),
-('New Orleans', 'A city rich in history, culture, and cuisine, famous for its jazz music and Mardi Gras celebrations.', 'Louisiana', 350.00, 0.00, 'Historic Hotel', 180.00),
-('Atlanta', 'A bustling metropolis with a thriving arts scene, historic sites, and diverse culinary offerings.', 'Georgia', 150.00, 0.00, 'Downtown Hotel', 100.00);
+('Miami', 'A vibrant city known for its beautiful beaches, lively nightlife, and diverse culture.', 'Florida', 200.00, 910.4, 'Beachfront Resort', 150.00),
+('Las Vegas', 'The entertainment capital of the world, famous for its casinos, shows, and nightlife.', 'Nevada', 300.00, 1790.6, 'Luxury Hotel & Casino', 200.00),
+('Myrtle Beach', 'A popular beach destination known for its pristine coastline and family-friendly attractions.', 'South Carolina', 250.00, 590.4, 'Oceanfront Resort', 120.00),
+('New Orleans', 'A city rich in history, culture, and cuisine, famous for its jazz music and Mardi Gras celebrations.', 'Louisiana', 350.00, 533.7, 'Historic Hotel', 180.00),
+('Atlanta', 'A bustling metropolis with a thriving arts scene, historic sites, and diverse culinary offerings.', 'Georgia', 150.00, 248.6, 'Downtown Hotel', 100.00);
 
 DELETE FROM DESTINATIONS
 WHERE destination_id > 5;
@@ -81,3 +81,28 @@ CREATE TABLE IF NOT EXISTS PLANS (
 
 ALTER TABLE PLANS
 ADD COLUMN FLIGHT VARCHAR(3);
+
+CREATE TABLE IMAGES (
+    IMAGE_ID INT AUTO_INCREMENT PRIMARY KEY,
+    DESTINATION_ID INT,
+    IMAGE_URL VARCHAR(255),
+    FOREIGN KEY (DESTINATION_ID) REFERENCES DESTINATIONS(DESTINATION_ID)
+);
+
+INSERT INTO IMAGES (DESTINATION_ID, IMAGE_URL) 
+VALUES 
+(1, 'https://www.mayflower.com/wp-content/uploads/2022/05/Miami-City-Guide_Header-scaled.jpg'),
+(2, 'https://imageio.forbes.com/specials-images/imageserve/656df61cc3a44648c235dde3/Las-Vegas--Nevada--USA-at-the-Welcome-Sign/960x0.jpg?format=jpg&width=1440'),
+(3, 'https://sanddunesmb.com/wp-content/uploads/2020/04/Myrtle-Beach-Boardwalk-400x267.jpg'),
+(4, 'https://assets.simpleviewinc.com/simpleview/image/upload/c_fill,h_560,q_60,w_960/v1/clients/neworleans/easter_5512c82b-353f-4e60-b216-c766a743e9cb.jpg'),
+(5, 'https://a.cdn-hotels.com/gdcs/production114/d1629/63a8dbe5-e678-4fe4-957a-ad367913a3fa.jpg?impolicy=fcrop&w=1600&h=1066&q=medium');
+
+SELECT * FROM IMAGES;
+
+
+
+SELECT * FROM TRIP;
+
+SELECT * FROM USERS;
+SELECT * FROM DESTINATIONS;
+
