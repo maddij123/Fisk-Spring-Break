@@ -83,6 +83,27 @@ def login():
             return render_template('login.html', message='Invalid email or password.')
 
     return render_template('login.html')
+# admin function
+@app.route('/admin', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['inputEmail']
+        password = request.form['inputPassword']
+
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM ADMIN WHERE EMAIL = %s", (email,))
+        admin = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if admin and admin[4] == password:
+            session['admin_id'] = admin[0]  # Store user ID in session
+            return redirect(url_for('adminlogin'))
+        else:
+            return render_template('adminlogin.html', message='Invalid email or password.')
+
+    return render_template('adminlogin.html')
 
 @app.route('/dashboard')
 def dashboard():
