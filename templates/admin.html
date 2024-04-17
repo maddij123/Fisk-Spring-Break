@@ -13,6 +13,7 @@
             <tr>
                 <th>User Name</th>
                 <th>Number of Trips</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -20,11 +21,15 @@
             <tr>
                 <td>{{ user_trip[0] }} {{ user_trip[1]}}</td>
                 <td>{{ user_trip[2] }}</td>
+                <td>
+                    <form action="/delete-user" method="post">
+                        <input type="text" name="user_id" placeholder="Enter User ID">
+                        <input type="submit" value="Delete">
+                    </form>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-
-
 </body>
 </html>

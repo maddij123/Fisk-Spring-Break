@@ -15,7 +15,7 @@ app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 
 
-@app.route('/')
+@app.route('/main')
 def main():
     return render_template('index.html')
 
@@ -274,7 +274,20 @@ def your_trips():
     else:
         return redirect(url_for('login'))
 
-
+@app.route('/delete-user', methods=['POST'])
+def delete_user():
+    if 'user_id' in session:
+        user_id = session['user_id']
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM USERS WHERE USER_ID = %s", (user_id,))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        session.pop('user_id', None)  # Remove user_id from the session
+        return redirect(url_for('index'))  # Redirect the user to the login page
+    else:
+        return redirect(url_for('index'))  # If the user is not logged in, redirect them to the login page
 
 
 if __name__ == "__main__":
