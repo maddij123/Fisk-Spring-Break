@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        
+    <title>Activities</title>
+        
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+        crossorigin="anonymous"
+    />
+    <style>
+        /* Custom styles */
+        body {
+            background-color: #f9fbe7; /* Light green background */
+        }
+
+        .header {
+            background-color: #80cbc4; /* Teal header background */
+        }
+
+        .footer {
+            background-color: #80cbc4; /* Teal footer background */
+        }
+
+        .activities-header {
+            font-size: 3rem; /* Larger header font size */
+        }
+
+        .btn-summer {
+            background-color: #ff9800; /* Orange button background */
+            color: #ffffff; /* White button text */
+            border-color: #ff9800; /* Orange border color */
+        }
+    </style>
+</head>
+
+<body>
+        
+    <div class="container text-center">
+                
+        <header class="header">
+                        
+            <nav
+                class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom"
+            >
+                <a
+                    href="/"
+                    class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none"
+                >
+                    <span class="fs-4">Spring Break Planner</span>
+                </a>
+
+                <ul class="nav nav-pills">
+                    <li class="nav-item">
+                        <a href="/" class="nav-link active" aria-current="page">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/signup" class="nav-link">Signup</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/login" class="nav-link">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin" class="nav-link">Admin</a>
+                    </li>
+                </ul>
+                                        
+            </nav>
+                                     
+        </header>
+
+                    
+        <div class="row marketing">
+            <div class="col-lg-6 mx-auto">
+                <h1 class="activities-header">Destination Activities</h1>
+                <p>Click the buttons below to see things to do at each destination.</p>
+                <div class="row row-cols-auto justify-content-center">
+                    {% for destination in destination_names %}
+                    <div class="col mb-3">
+                        <a href="{% if destination[0] == 'Miami' %}https://www.tripadvisor.com/Attractions-g34438-Activities-Miami_Florida.html{% elif destination[0] == 'Las Vegas' %}https://www.visitlasvegas.com/{% elif destination[0] == 'Myrtle Beach' %}https://www.visitmyrtlebeach.com/?utm_source=vmb_google&utm_medium=cpc&utm_campaign=MI+Visit+Myrtle+Beach+Search+Brand&gad_source=1&gclid=CjwKCAjw5v2wBhBrEiwAXDDoJSF0chLoZF_r9w82INQeZkhnrlJub5VBKHubg-fEeG3a7URm6l3NNBoCcgoQAvD_BwE{% elif destination[0] == 'New Orleans' %}https://www.neworleans.com/{% elif destination[0] == 'Atlanta' %}https://discoveratlanta.com/{% endif %}" class="btn btn-summer btn-lg">{{ destination[0] }}</a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+       <form id="activityForm" method="POST" action="/add_activity">
+            <div class="form-group">
+                <label for="destination">Destination:</label>
+                <select class="form-control" id="destination" name="destination_name">
+                    <option value="Miami">Miami</option>
+                    <option value="Las Vegas">Las Vegas</option>
+                    <option value="Myrtle Beach">Myrtle Beach</option>
+                    <option value="New Orleans">New Orleans</option>
+                    <option value="Atlanta">Atlanta</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="name">Activity Name:</label>
+                <input type="text" class="form-control" id="name" name="name">
+            </div>
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <textarea class="form-control" id="description" name="description"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="price">Price:</label>
+                <input type="number" class="form-control" id="price" name="price" step="0.01" min="0.00" placeholder="0.00">
+            </div>            
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+        
+        <footer class="footer">
+            <p>&copy; Established 1866</p>
+        </footer>
+    </div>
+</body>
+</html>
