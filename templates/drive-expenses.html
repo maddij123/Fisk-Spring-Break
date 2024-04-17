@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drive Expenses</title>
+    <title>Expenses</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         body {
@@ -30,13 +30,33 @@
             font-size: 18px;
             color: #666;
         }
+        .home-button {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .home-button a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4caf50;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .home-button a:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Drive Expenses</h2>
-        <p>Number of Miles: {{ num_miles }}</p>
-        <p>Hotel Price: ${{ hotel_price }}</p>
+        <h2>Expenses</h2>
+        <p>Number of People: {{ num_people }}</p>
+        <p>Total Expenses: ${{ total_expenses }}</p>
+        <div class="home-button">
+            <a href="/">Home</a>
+        </div>
     </div>
 </body>
 </html>
