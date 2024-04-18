@@ -78,10 +78,10 @@ def dashboard():
         user_data = users_collection.find_one({'_id': ObjectId(user_id)})
 
         # Fetch destinations data from database
-        destinations_collection = db['destinations']
+        destinations_collection = db['Destinations']
         destinations = destinations_collection.find()
 
-        return render_template('dashboard.html', user=user_data, destinations=destinations)
+        return render_template('dashboarddb.html', user=user_data, destinations=destinations)
     else:
         return redirect(url_for('login'))
 
