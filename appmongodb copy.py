@@ -94,7 +94,7 @@ def admin_login():  # Rename the function
         admin_collection = db['admin']
         admin = admin_collection.find_one({"email": email})
 
-        if admin and admin['password'] == password:
+        if admin and admin['password_hash'] == password:
             session['admin_id'] = str(admin['_id'])  # Store admin ID in session
             return redirect(url_for('admin_dashboard'))  # Redirect to admin panel
         else:
@@ -106,12 +106,12 @@ def admin_login():  # Rename the function
 def admin_dashboard():
     if 'admin_id' in session:  
         users_collection = db['users']
-        trips_collection = db['trips']
+        trips_collection = db['trip']  # Adjust collection name to 'trip'
 
         user_trip_data = users_collection.aggregate([
             {
                 "$lookup": {
-                    "from": "trips",
+                    "from": "trip",  # Adjust collection name to 'trip'
                     "localField": "_id",
                     "foreignField": "user_id",
                     "as": "user_trips"
@@ -119,16 +119,19 @@ def admin_dashboard():
             },
             {
                 "$project": {
+                    "_id": 1,
                     "first_name": 1,
                     "last_name": 1,
-                    "num_trips": {"$size": "$user_trips"}
+                    "num_trips": { "$size": "$user_trips" }  # Count the number of trips
                 }
             }
         ])
 
-        return render_template('admin.html', user_trip_data=list(user_trip_data))
+        return render_template('admindb.html', user_trip_data=list(user_trip_data))
     else:
         return redirect(url_for('adminlogin'))
+
+
 
 # @app.route('/dashboard')
 # def dashboard():
@@ -192,8 +195,8 @@ def calculate_expenses():
         _trip_id = request.form['trip_id']
         _num_people = int(request.form['num_people'])
 
-        trip = db.trips.find_one({"_id": ObjectId(_trip_id)})
-        destination = db.destinations.find_one({"_id": ObjectId(trip['destination_id'])})
+        trip = db.trip.find_one({"_id": ObjectId(_trip_id)})
+        destination = db.destinations.find_one({"_id": ObjectId(trip.get('destination_id'))})
 
         if destination:
             flight_price = destination['flight_price']
@@ -201,7 +204,7 @@ def calculate_expenses():
 
             total_expenses = _num_people * (flight_price + hotel_price)
 
-            return render_template('flight-expenses.html', destination=destination, num_people=_num_people,
+            return render_template('flight-expensesdb.html', destination=destination, num_people=_num_people,
                                    total_expenses=total_expenses)
         else:
             return 'Destination not found for the given trip ID.'
@@ -214,7 +217,7 @@ def drive_expenses():
     try:
         trip_id = request.form['trip_id']
 
-        trip = db.trips.find_one({"_id": ObjectId(trip_id)})
+        trip = db.trip.find_one({"_id": ObjectId(trip_id)})
         destination = db.destinations.find_one({"_id": ObjectId(trip['destination_id'])})
 
         num_miles = destination['distance']
@@ -245,19 +248,25 @@ def your_trips():
 
 @app.route('/delete-user', methods=['POST'])
 def delete_user():
-    if 'user_id' in session:
-        user_id = session['user_id']
+    if 'admin_id' in session:
+        user_id = request.form.get('user_id')  # Fetch user_id from the form data
+        
+        if user_id:
+            # Convert user_id to ObjectId
+            user_id = ObjectId(user_id)
 
-        # Delete associated trip records
-        db.trip.delete_many({'user_id': ObjectId(user_id)})
+            # Delete associated trip records
+            db.trip.delete_many({'user_id': user_id})  # Adjust collection name to 'trip'
 
-        # Now delete the user
-        db.users.delete_one({'_id': ObjectId(user_id)})
+            # Now delete the user
+            db.users.delete_one({'_id': user_id})
 
-        session.pop('user_id', None)  # Remove user_id from the session
-        return redirect(url_for('admin_dashboard'))  # Redirect the user to the login page
+            return redirect(url_for('admin_dashboard'))  # Redirect the user to the admin dashboard
+        else:
+            return "User ID not provided."
     else:
-        return redirect(url_for('adminlogin'))  # If the user is not logged in, redirect them to the login page
+        return redirect(url_for('adminlogin'))
+
 
 @app.route('/update_password', methods=['GET', 'POST'])
 def update_password():
