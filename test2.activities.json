@@ -1,0 +1,22 @@
+[{
+  "_id": {
+    "$oid": "6621642fc980ea827a47c611"
+  },
+  "destination_id": {
+    "$oid": "662121d5d872947c64d14a18"
+  },
+  "name": "Swimming",
+  "description": "swimming at the beach",
+  "price": 2
+},
+{
+  "_id": {
+    "$oid": "6621648a6cb72c4b45bc17f4"
+  },
+  "destination_id": {
+    "$oid": "662121d5d872947c64d14a18"
+  },
+  "name": "Swimming",
+  "description": "swimming at the beach",
+  "price": 2
+}]

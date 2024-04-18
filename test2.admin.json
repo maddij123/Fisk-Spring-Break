@@ -1,0 +1,20 @@
+[{
+  "_id": {
+    "$oid": "6621381bd872947c64d14a1d"
+  },
+  "first_name": "Laila",
+  "last_name": "Eliotti",
+  "email": "lailaeliotti1@gmail.com",
+  "password_hash": "test1234",
+  "admin_role": "Owner"
+},
+{
+  "_id": {
+    "$oid": "6621381bd872947c64d14a1e"
+  },
+  "first_name": "Madison",
+  "last_name": "Jones",
+  "email": "maddij123@gmail.com",
+  "password_hash": "test1234",
+  "admin_role": "Owner"
+}]
