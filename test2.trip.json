@@ -1,0 +1,55 @@
+[{
+  "_id": {
+    "$oid": "6621220e020229c96a2fddd7"
+  },
+  "destination_id": {
+    "$oid": "662121d5d872947c64d14a18"
+  },
+  "user_id": "66203cf08af84bb168c1f5bf",
+  "start_date": "2024-04-18",
+  "end_date": "2024-04-21"
+},
+{
+  "_id": {
+    "$oid": "66212260020229c96a2fddd8"
+  },
+  "destination_id": {
+    "$oid": "662121d5d872947c64d14a18"
+  },
+  "user_id": "66203cf08af84bb168c1f5bf",
+  "start_date": "2024-04-18",
+  "end_date": "2024-04-21"
+},
+{
+  "_id": {
+    "$oid": "662122953fc8f8cfa39cd8e1"
+  },
+  "destination_id": {
+    "$oid": "662121d5d872947c64d14a18"
+  },
+  "user_id": "66203cf08af84bb168c1f5bf",
+  "start_date": "2024-04-18",
+  "end_date": "2024-04-21"
+},
+{
+  "_id": {
+    "$oid": "662123b1cec499dab32ecef1"
+  },
+  "destination_id": {
+    "$oid": "662121d5d872947c64d14a18"
+  },
+  "user_id": "66203cf08af84bb168c1f5bf",
+  "start_date": "2024-04-18",
+  "end_date": "2024-04-21"
+},
+{
+  "_id": {
+    "$oid": "662124e795e8b5cb08b4e6db"
+  },
+  "destination_id": {
+    "$oid": "662121d5d872947c64d14a18"
+  },
+  "user_id": "66203cf08af84bb168c1f5bf",
+  "start_date": "2024-04-18",
+  "end_date": "2024-04-21"
+}]
