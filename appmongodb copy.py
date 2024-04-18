@@ -78,12 +78,12 @@ def dashboard():
         user_data = users_collection.find_one({'_id': ObjectId(user_id)})
 
         # Fetch destinations data from database
-        destinations_collection = db['Destinations']
+        destinations_collection = db['destinations']
         destinations = destinations_collection.find()
 
         return render_template('dashboarddb.html', user=user_data, destinations=destinations)
     else:
-        return redirect(url_for('login'))
+        return redirect(url_for('login.html'))
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin_login():  # Rename the function
@@ -154,15 +154,20 @@ def add_trip():
             _end_date = request.form['end_date']
             _user_id = session['user_id']
 
-            selected_trip_data = db.destinations.find_one({"_id": ObjectId(_destination_id)}, {"name": 1, "image_url": 1})
+            # Convert _destination_id to ObjectId
+            _destination_id = ObjectId(_destination_id)
+
+            selected_trip_data = db.destinations.find_one({"_id": _destination_id}, {"name": 1, "image_url": 1})
             selected_trip_name = selected_trip_data['name']
             image_url = selected_trip_data['image_url']
 
-            trip_id = db.trip.insert_one({"destination_id": ObjectId(_destination_id), "user_id": _user_id, "start_date": _start_date, "end_date": _end_date}).inserted_id
+            # Insert trip into the database
+            trip_id = db.trip.insert_one({"destination_id": _destination_id, "user_id": _user_id, "start_date": _start_date, "end_date": _end_date}).inserted_id
 
-            activities = list(db.activities.find({"destination_id": ObjectId(_destination_id)}, {"name": 1, "description": 1, "price": 1}))
+            # Fetch activities for the destination
+            activities = list(db.activities.find({"destination_id": _destination_id}, {"name": 1, "description": 1, "price": 1}))
 
-            return render_template('tripplan.html', trip_name=selected_trip_name, image_url=image_url, activities=activities, trip_id=str(trip_id))
+            return render_template('tripplandb.html', trip_name=selected_trip_name, image_url=image_url, activities=activities, trip_id=str(trip_id))
         except Exception as e:
             return jsonify({'error': str(e)})
     else:
