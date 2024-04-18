@@ -204,7 +204,7 @@ def calculate_expenses():
 
             total_expenses = _num_people * (flight_price + hotel_price)
 
-            return render_template('flight-expensesdb.html', destination=destination, num_people=_num_people,
+            return render_template('flight-expenses.html', destination=destination, num_people=_num_people,
                                    total_expenses=total_expenses)
         else:
             return 'Destination not found for the given trip ID.'
