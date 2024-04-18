@@ -2,6 +2,9 @@ from flask import Flask, render_template, json, request, redirect, url_for, sess
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
 from bson.objectid import ObjectId
+from flask import request
+from flask import jsonify
+
 
 app = Flask(__name__)
 
@@ -127,20 +130,20 @@ def admin_dashboard():
     else:
         return redirect(url_for('adminlogin'))
 
-@app.route('/dashboard')
-def dashboard():
-    if 'user_id' in session:
-        # Fetch user data from database using session['user_id']
-        users_collection = db['users']
-        user_data = users_collection.find_one({"_id": ObjectId(session['user_id'])})
+# @app.route('/dashboard')
+# def dashboard():
+#     if 'user_id' in session:
+#         # Fetch user data from database using session['user_id']
+#         users_collection = db['users']
+#         user_data = users_collection.find_one({"_id": ObjectId(session['user_id'])})
 
-        # Fetch destinations data from database
-        destinations_collection = db['destinations']
-        destinations = list(destinations_collection.find())
+#         # Fetch destinations data from database
+#         destinations_collection = db['destinations']
+#         destinations = list(destinations_collection.find())
 
-        return render_template('dashboard.html', user=user_data, destinations=destinations)
-    else:
-        return redirect(url_for('login'))
+#         return render_template('dashboard.html', user=user_data, destinations=destinations)
+#     else:
+#         return redirect(url_for('login'))
     
 @app.route('/add_trip', methods=['POST'])
 def add_trip():
