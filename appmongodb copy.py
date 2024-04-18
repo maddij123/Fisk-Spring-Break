@@ -242,7 +242,7 @@ def your_trips():
             'destination_name': db.destinations.find_one({"_id": ObjectId(trip['destination_id'])})['name']
         } for trip in trips_data]
 
-        return render_template('your_trips.html', trips=trips)
+        return render_template('your_tripsdb.html', trips=trips)
     else:
         return redirect(url_for('login'))
 
@@ -328,10 +328,9 @@ def activity_success(destination_name):
     try:
         # Join the DESTINATIONS collection with the PACKING_LIST collection to get the success message
         destination = db.destinations.find_one({'name': destination_name})
-        packing_list = db.packing_list.find_one({'destination_id': destination['_id']})
 
-        if packing_list:
-            success_message = f"When going to {destination['name']}, make sure you bring {packing_list['necessity']}!"
+        if destination:
+            success_message = f"When going to {destination['name']}, make sure you bring {destination['necessity']}!"
             return render_template('activity_success.html', success_message=success_message)
         else:
             return "No success message found for this destination."
